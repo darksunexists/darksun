@@ -1,0 +1,5 @@
+# Default owner for everything in the repo
+* @0xtito
+
+# Workflow files
+.github/* @0xtito 

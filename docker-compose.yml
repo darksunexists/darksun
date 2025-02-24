@@ -1,0 +1,32 @@
+services:
+  standalone:
+    image: darksun-standalone:latest
+    profiles: ['standalone']
+    container_name: darksun-standalone
+    expose:
+      - '3001'
+    env_file:
+      - .env
+
+  ds-twitter:
+    image: darksun-twitter:latest
+    profiles: ['twitter']
+    container_name: darksun-twitter
+    env_file:
+      - .env
+
+  ds-telegram:
+    image: darksun-telegram:latest
+    profiles: ['telegram']
+    container_name: darksun-telegram
+    env_file:
+      - .env
+
+  holmes:
+    image: darksun-holmes:latest
+    profiles: ['holmes']
+    container_name: darksun-holmes
+    expose:
+      - '3000'
+    env_file:
+      - .env

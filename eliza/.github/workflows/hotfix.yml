@@ -1,0 +1,90 @@
+name: Hotfix Deployment
+
+on:
+    push:
+        branches:
+            - "hotfix/**"
+    workflow_dispatch:
+        inputs:
+            version_bump:
+                description: "Version bump type"
+                required: true
+                default: "patch"
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
+
+jobs:
+    deploy-hotfix:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - uses: pnpm/action-setup@v3
+              with:
+                  version: 9.4.0
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "23"
+                  cache: "pnpm"
+
+            - name: Configure Git
+              run: |
+                  git config user.name "${{ github.actor }}"
+                  git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+            - name: Install dependencies
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Build packages
+              run: pnpm run build
+
+            - name: Bump version and create tag
+              id: version
+              run: |
+                  # Get current version
+                  CURRENT_VERSION=$(node -p "require('./package.json').version")
+
+                  # Determine version bump type
+                  BUMP_TYPE=${{ github.event.inputs.version_bump || 'patch' }}
+
+                  # Create new version with -hotfix suffix
+                  npm version $BUMP_TYPE --no-git-tag-version
+                  NEW_VERSION=$(node -p "require('./package.json').version")
+                  HOTFIX_VERSION="${NEW_VERSION}-hotfix.$(date +%Y%m%d%H%M%S)"
+
+                  # Update version in package.json
+                  npm version $HOTFIX_VERSION --no-git-tag-version
+
+                  # Create and push tag
+                  git add package.json
+                  git commit -m "chore: bump version to ${HOTFIX_VERSION}"
+                  git tag -a "v${HOTFIX_VERSION}" -m "Hotfix release ${HOTFIX_VERSION}"
+                  git push origin "v${HOTFIX_VERSION}"
+
+                  # Set output for use in subsequent steps
+                  echo "version=${HOTFIX_VERSION}" >> $GITHUB_OUTPUT
+
+            - name: Create Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  tag_name: v${{ steps.version.outputs.version }}
+                  generate_release_notes: true
+                  prerelease: true
+                  body: |
+                      🚨 **HOTFIX RELEASE**
+
+                      This is a hotfix release. Please update to this version immediately if you are affected by the issues it addresses.
+
+                      ## Installation
+                      ```bash
+                      git fetch origin
+                      git checkout v${{ steps.version.outputs.version }}
+                      pnpm install
+                      pnpm build
+                      ```

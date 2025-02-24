@@ -1,0 +1,55 @@
+name: CI
+
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main, develop]
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v3
+              with:
+                  version: 9.4.0
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "23"
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install -r --no-frozen-lockfile
+
+            - name: Run Prettier
+              run: pnpm run prettier --check .
+
+            - name: Run Linter
+              run: pnpm run lint
+
+            - name: Create test env file
+              run: |
+                  echo "TEST_DATABASE_CLIENT=sqlite" > packages/core/.env.test
+                  echo "NODE_ENV=test" >> packages/core/.env.test
+
+            - name: Run tests
+              run: cd packages/core && pnpm test:coverage
+
+            - name: Build packages
+              run: pnpm run build
+
+    version-check:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check if version bump needed
+              run: |
+                  git diff origin/main...HEAD --name-only | grep -q "package.json" || \
+                  (echo "::error::When merging to main, package.json version must be updated" && exit 1)

@@ -1,0 +1,23 @@
+{
+  "name": "@elizaos/plugin-investigate",
+  "version": "0.1.7-alpha.2",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@elizaos/core": "workspace:*",
+    "@elizaos/service-trigger": "workspace:*",
+    "tsup": "8.3.5",
+    "@mendable/firecrawl-js": "1.11.2"
+  },
+  "devDependencies": {
+    "agent-twitter-client": "0.0.18",
+    "@elizaos/adapter-postgres": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup --format esm --dts",
+    "dev": "tsup --format esm --dts --watch",
+    "test": "vitest run",
+    "trigger:dev": "pnpm dlx trigger.dev@latest dev"
+  }
+}

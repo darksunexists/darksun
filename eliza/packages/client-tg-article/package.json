@@ -1,0 +1,22 @@
+{
+    "name": "@elizaos/client-tg-article",
+    "version": "0.1.5-alpha.0",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "@telegraf/types": "7.1.0",
+        "telegraf": "4.16.3",
+        "zod": "3.23.8"
+    },
+    "devDependencies": {
+        "tsup": "8.3.5"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --watch",
+        "lint": "eslint . --fix"
+    },
+    "gitHead": "3d447cc9e0aad9c8b83556d1888d1ff37acb63f7"
+}

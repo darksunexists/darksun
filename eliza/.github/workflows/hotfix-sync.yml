@@ -1,0 +1,47 @@
+name: Sync Hotfix to Develop
+
+on:
+    pull_request:
+        types: [closed]
+        branches:
+            - main
+
+jobs:
+    create-develop-pr:
+        if: |
+            github.event.pull_request.merged == true &&
+            startsWith(github.event.pull_request.head.ref, 'hotfix/')
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: develop
+
+            - name: Create PR to develop
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Get the hotfix branch name
+                  HOTFIX_BRANCH="${{ github.event.pull_request.head.ref }}"
+
+                  # Create a new branch from develop
+                  SYNC_BRANCH="sync/${HOTFIX_BRANCH}-to-develop"
+                  git checkout -b $SYNC_BRANCH
+
+                  # Cherry-pick the merge commit
+                  git cherry-pick ${{ github.event.pull_request.merge_commit_sha }}
+
+                  # Push the branch
+                  git push origin $SYNC_BRANCH
+
+                  # Create PR
+                  gh pr create \
+                    --base develop \
+                    --head $SYNC_BRANCH \
+                    --title "chore: sync hotfix ${HOTFIX_BRANCH} to develop" \
+                    --body "This PR syncs the hotfix from \`${HOTFIX_BRANCH}\` that was merged into \`main\` to the \`develop\` branch.
+
+                    Original PR: #${{ github.event.pull_request.number }}
+
+                    This PR was automatically created by the hotfix sync workflow."

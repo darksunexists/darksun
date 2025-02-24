@@ -1,0 +1,40 @@
+{
+    "name": "@elizaos/client-backroom",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "@elizaos/plugin-image-generation": "workspace:*",
+        "@elizaos/adapter-postgres": "workspace:*",
+        "@types/body-parser": "1.19.5",
+        "@types/cors": "2.8.17",
+        "@types/express": "5.0.0",
+        "body-parser": "1.20.3",
+        "cors": "2.8.5",
+        "express": "4.21.1",
+        "multer": "1.4.5-lts.1",
+        "@coral-xyz/anchor": "^0.30.1",
+        "@solana/web3.js": "^1.98.0",
+        "bs58": "^4.0.1",
+        "buffer": "^6.0.3",
+        "agent-twitter-client": "0.0.18",
+        "@elizaos/service-trigger": "workspace:*"
+    },
+    "devDependencies": {
+        "tsup": "8.3.5",
+        "@types/multer": "^1.4.12",
+        "@types/bs58": "^4.0.4"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "dev": "tsup --watch",
+        "lint": "eslint . --fix",
+        "trigger:dev": "pnpm dlx trigger.dev@3.3.11 dev",
+        "trigger:deploy": "pnpm dlx trigger.dev@3.3.11 deploy"
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    }
+}

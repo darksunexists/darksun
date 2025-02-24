@@ -1,0 +1,78 @@
+{
+  "name": "darksun",
+  "version": "1.0.0",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "turbo run build",
+    "docker:build-tg": "bash ./scripts/docker.sh build telegram",
+    "docker:build-tw": "bash ./scripts/docker.sh build twitter",
+    "docker:run-tg": "bash ./scripts/docker.sh run telegram",
+    "docker:run-tw": "bash ./scripts/docker.sh run twitter",
+    "docker:bash": "bash ./scripts/docker.sh bash",
+    "docker:start-tg": "bash ./scripts/docker.sh start telegram",
+    "docker:start-tw": "bash ./scripts/docker.sh start twitter",
+    "docker": "pnpm docker:build-tg && pnpm docker:run-tg && pnpm docker:bash",
+    "start:ds-twitter": "node --trace-warnings --loader ts-node/esm agents/src/index.ts --mode darksun-twitter --characters agents/src/characters/darksun-twitter-v2.ts",
+    "start:ds-twitter-v3": "node --trace-warnings --loader ts-node/esm agents/src/index.ts --mode darksun-twitter --characters agents/src/characters/darksun-twitter-v3.ts",
+    "start:ds-twitter-i": "node --trace-warnings --loader ts-node/esm agents/src/index.ts --mode darksun-twitter --characters agents/src/characters/darksun-twitter-investigator.ts",
+    "start:backroom-api": "node --trace-warnings --loader ts-node/esm agents/src/index.ts --mode backroom-api --characters 'agents/src/characters/holmes.ts'",
+    "start:investigate-api": "node --trace-warnings --loader ts-node/esm agents/src/index.ts --mode investigate-api --characters 'agents/src/characters/darksun-backroom-investigate.ts,agents/src/characters/holmes.ts,agents/src/characters/metadata-analyzer.ts'",
+    "clean": "bash ./scripts/clean.sh",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "check": "pnpm run lint:check && pnpm run format:check",
+    "fix": "pnpm run lint && pnpm run format",
+    "prettier-check": "npx prettier --check .",
+    "prettier": "npx prettier --write ."
+  },
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.5.0",
+    "yargs": "^17.7.2",
+    "zod": "^3.23.8",
+    "@0glabs/0g-ts-sdk": "0.2.1",
+    "@coinbase/coinbase-sdk": "0.10.0",
+    "@deepgram/sdk": "^3.9.0",
+    "@vitest/eslint-plugin": "1.0.1",
+    "amqplib": "0.10.5",
+    "csv-parse": "5.6.0",
+    "ollama-ai-provider": "0.16.1",
+    "optional": "0.1.4",
+    "pnpm": "9.14.4",
+    "sharp": "0.33.5",
+    "tslog": "4.9.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "turbo": "2.3.3",
+    "tsup": "^8.3.5",
+    "only-allow": "1.2.1",
+    "@eslint/js": "^9.16.0",
+    "eslint": "9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "globals": "^14.0.0",
+    "prettier": "3.4.1",
+    "@typescript-eslint/eslint-plugin": "8.16.0",
+    "@typescript-eslint/parser": "8.16.0",
+    "vite": "5.4.11",
+    "vitest": "2.1.5",
+    "concurrently": "9.1.0",
+    "cross-env": "7.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "onnxruntime-node": "^1.20.0",
+      "viem": "2.21.58"
+    }
+  },
+  "engines": {
+    "node": "23.3.0"
+  },
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
+  "workspaces": [
+    "eliza/packages/*"
+  ]
+}

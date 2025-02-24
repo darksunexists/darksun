@@ -1,0 +1,9 @@
+# Allow specific TypeScript files
+!src/**/*.ts
+!modes/**/*.ts
+!characters/**/*.ts
+.env
+*.env
+.env*
+/data
+/generatedImages

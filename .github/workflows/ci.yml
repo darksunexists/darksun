@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GH_TOKEN }}
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.14.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '23.3.0'
+          cache: 'pnpm'
+
+      - name: Configure git credentials
+        run: |
+          git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+      - name: Initialize and update submodules
+        run: |
+          # Initialize without recursive
+          git submodule update --init --recursive || true
+
+          # Verify eliza directory exists
+          ls -la
+          ls -la eliza || echo "eliza directory not found"
+
+      - name: Install Eliza dependencies
+        run: |
+          cd eliza
+          pnpm install --no-frozen-lockfile
+
+      - name: Install Darksun dependencies
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm recursive list
+
+      - name: Run Prettier
+        run: pnpm run prettier --check .
+
+      - name: Run Linter
+        run: pnpm run lint
+
+      - name: Build packages
+        run: pnpm run build
+
+  create-main-pr:
+    needs: check
+    runs-on: ubuntu-latest
+    if: github.event.ref == 'refs/heads/develop' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: develop
+          title: 'chore: merge develop into main'
+          body: |
+            Automated PR to merge develop into main
+
+            This PR was automatically created after changes were pushed to develop.
+          labels: automated-pr
